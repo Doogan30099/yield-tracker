@@ -12,7 +12,7 @@ A small Python command-line utility for summarizing plant counts from a harvest 
 Run the script from the project directory so it can find `harvests.csv`:
 
 ```powershell
-python Report.py
+python report.py
 ```
 
 The script prints the total plant count followed by the count for each strain. If a row has a blank `plants` value, it prints a message identifying the strain and skips that row. Strain counts are combined across all matching rows, including rows from different cycles.
