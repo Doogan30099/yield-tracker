@@ -1,0 +1,4 @@
+#   try to convert grams_per_plant to a float
+#   if that raises a ValueError (blank cell):
+#       print the strain name plus "information has not been added yet"
+#       skip to the next row
