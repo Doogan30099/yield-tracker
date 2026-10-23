@@ -1,38 +1,40 @@
 # Yield Tracker
 
-A simple yield-tracking app for commercial cannabis cultivation. The goal is to bring yield records, strain information, and cultivation data points together so teams can follow crop progress and compare results over time.
+A small Python command-line utility for summarizing plant counts from a harvest CSV. The current report groups plant counts by strain and prints the overall total.
 
-## Goals
+## Requirements
 
-- Pull yield data from a cultivation or reporting source once an integration is configured.
-- Associate each yield record with its strain and cultivation run.
-- Record useful data points throughout a run and review them alongside the final yield.
-- Make it easier to compare progress and outcomes across strains and runs.
+- Python 3
+- No third-party packages
 
-## Tracking model
+## Usage
 
-A useful record can include:
+Run the script from the project directory so it can find `harvests.csv`:
 
-| Record | Example details |
+```powershell
+python Report.py
+```
+
+The script prints the total plant count followed by the count for each strain. If a row has a blank `plants` value, it prints a message identifying the strain and skips that row. Strain counts are combined across all matching rows, including rows from different cycles.
+
+## Input file
+
+The report reads `harvests.csv` from the current working directory. It expects a CSV with a header row containing a `strain` column and a `plants` column. The repository's sample file also includes:
+
+| Column | Description |
 | --- | --- |
-| Strain | Strain name and, if available, an internal identifier |
-| Cultivation run | Run or batch identifier, facility or room, and relevant dates |
-| Data point | Measurement name, value, unit, and date recorded |
-| Yield | Harvest amount, unit, harvest date, and source record |
+| `harvest_date` | Harvest date |
+| `trim_start_date` | Trim start date |
+| `cycle_number` | Cultivation cycle identifier |
+| `strain` | Strain name used to group plant counts |
+| `grade_a_grams` | Grade A yield in grams |
+| `extraction_grams` | Extraction yield in grams |
+| `plants` | Plant count used in the report |
+| `avg_potency_pct` | Average potency percentage |
+| `grams_per_plant` | Yield in grams per plant |
 
-Keep units and measurement dates with each value so that data from different runs can be interpreted and compared consistently. The exact fields should be adapted to the cultivation team's existing records and data source.
+Only `strain` and `plants` are currently used by the report. Leave `plants` blank when the count is not available; values in that column must otherwise be whole numbers.
 
-## Intended workflow
+## Current scope
 
-1. Connect or import a supported yield-data source.
-2. Match incoming records to strains and cultivation runs.
-3. Add or import dated data points as a run progresses.
-4. Review yield and data-point history by strain or run.
-
-## Project status
-
-This repository is currently a starting point: the application has not been implemented, and no data source, interface, or storage format has been selected. The integration and setup instructions will be added once those choices are made.
-
-## Responsible use
-
-Use the tracker only for lawful, authorized cultivation operations. Follow applicable licensing, recordkeeping, privacy, and data-retention requirements. Confirm imported measurements and units against their source before relying on comparisons or reports.
+This project currently reports plant counts only. It does not yet calculate yields, validate or transform the other CSV fields, or provide an interactive interface.
