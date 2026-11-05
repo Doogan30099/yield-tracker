@@ -43,21 +43,12 @@ def get_all_yields():
     #     return {"yields": list(reader)}
 
 
-@app.post("/harvests")
+@app.post("/harvests", response_model=Harvest)
 def create_harvest(harvest: Harvest):
-    with open("harvests.csv", "a", newline="") as csvfile:
-        fieldnames = [
-            "harvest_date",
-            "trim_start_date",
-            "cycle_number",
-            "strain",
-            "grade_a_grams",
-            "extraction_grams",
-            "plants",
-            "avg_potency_pct",
-            "grams_per_plant"
-        ]
-        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-        writer.writerow(harvest.model_dump())
-    return {"message": "Harvest created",
-            "harvest" : harvest }
+    harvest_data = harvest.model_dump()
+    with Session(engine) as session:
+        harvest_model = HarvestModel(**harvest_data)
+        session.add(harvest_model)
+        session.commit()
+        session.refresh(harvest_model)
+    return harvest_model
