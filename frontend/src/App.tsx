@@ -1,9 +1,32 @@
 import HarvestCard from './components/HarvestCard'
 import './App.css'
+import type { HarvestCardProps } from './components/HarvestCard'
+import { useState, useEffect  } from 'react'
 
 
 
 function App() {
+
+ const [harvests, setHarvests] = useState<HarvestCardProps[]>([]);
+ const [error, setError] = useState<string | null>(null);
+ const [loading, setLoading] = useState<boolean>(true);
+ const [searchTerm, setSearchTerm] = useState<string>("");
+
+
+
+useEffect(() => {
+  fetch("http://127.0.0.1:8000/harvests")
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      return response.json();
+    })
+    .then((data) => setHarvests(data))
+    .catch((error) => setError(error.message))
+    .finally(() => setLoading(false));
+}, []);
+
 
   return (
     <>
@@ -15,22 +38,35 @@ function App() {
       </section>
       <section id= 'harvestCard'>
         <div>
-          <HarvestCard
-            strainName="THEORYx Sunset Sherbert"
-            yieldAmount="500g"
-            potency="25%"
-            harvestDate="2026-06-01"
-            description="THEORYx Sunset Sherbert is a hybrid bred by Sherbinskis. This potent bud from Girl Scout Cookies lineage has complex aromas of skunky citrus and sweet berries. It may provide users with a euphoric lift that may ease a racy mind and could also provide potent full body relaxation thanks to its indica dominance."
+          <input 
+            type="text" 
+            placeholder="Search by cycle number or strain" 
+            value={searchTerm} 
+            onChange={(e) => setSearchTerm(e.target.value)} 
           />
-          <HarvestCard
-            strainName="THEORYx Gelato"
-            yieldAmount="450g"
-            potency="32%"
-            harvestDate="2026-06-15"
-            description="THEORYx Gelato is a hybrid known for its sweet and fruity aroma. This strain may provide a balanced high that combines euphoria with relaxation, making it suitable for both daytime and evening use."
-          />
+          {harvests
+            .filter((harvest) => 
+              harvest.cycle_number?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+              harvest.strain?.toLowerCase().includes(searchTerm.toLowerCase())
+            )
+            .map((harvest) => (
+            <HarvestCard 
+              key={harvest.cycle_number + ':' +harvest.strain}
+              harvest_date={harvest.harvest_date}
+              trim_start_date={harvest.trim_start_date}
+              cycle_number={harvest.cycle_number}
+              strain={harvest.strain}
+              grade_a_grams={harvest.grade_a_grams}
+              extraction_grams={harvest.extraction_grams}
+              plants={harvest.plants}
+              avg_potency_pct={harvest.avg_potency_pct}
+              grams_per_plant={harvest.grams_per_plant}
+            />
+          ))}
         </div>
-        
+        {error && <p style={{ color: "red" }}>{error}</p>}
+        {loading && <p>Loading...</p>}
+        {!loading && !error && harvests.length === 0 && <p>No harvests found.</p>}
       </section>
     </>
   )
