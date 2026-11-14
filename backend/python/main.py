@@ -1,6 +1,5 @@
 
 from fastapi import FastAPI
-import csv
 from pydantic import BaseModel, ConfigDict
 from datetime import date
 from sqlalchemy.orm import Session
@@ -22,7 +21,7 @@ class Harvest(BaseModel):
     strain: str | None = None
     grade_a_grams: float | None = None
     extraction_grams: float | None = None
-    plants: int | None = None
+    plant_count: int | None = None
     avg_potency_pct: float | None = None
     grams_per_plant: float | None = None
 
@@ -31,8 +30,9 @@ app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5173"],
-    allow_methods=["GET"],
+    allow_methods=["GET","POST"],
     allow_headers=["*"],
+
 )
 
 
@@ -48,9 +48,7 @@ def get_all_yields():
         result = session.execute(stmt)
         harvests = result.scalars().all()
         return harvests
-    # with open("harvests.csv", newline="") as csvfile:
-    #     reader = csv.DictReader(csvfile)
-    #     return {"yields": list(reader)}
+
 
 
 @app.post("/harvests", response_model=Harvest)
