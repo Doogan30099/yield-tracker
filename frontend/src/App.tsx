@@ -14,8 +14,8 @@ function App() {
 
 
 
-useEffect(() => {
-  fetch("http://127.0.0.1:8000/harvests")
+async function loadHarvests() {
+  return fetch("http://127.0.0.1:8000/harvests")
     .then((response) => {
       if (!response.ok) {
         throw new Error("Network response was not ok");
@@ -25,6 +25,10 @@ useEffect(() => {
     .then((data) => setHarvests(data))
     .catch((error) => setError(error.message))
     .finally(() => setLoading(false));
+}
+
+useEffect(() => {
+  loadHarvests()
 }, []);
 
 
@@ -58,7 +62,7 @@ useEffect(() => {
               strain={harvest.strain}
               grade_a_grams={harvest.grade_a_grams}
               extraction_grams={harvest.extraction_grams}
-              plants={harvest.plants}
+              plant_count={harvest.plant_count}
               avg_potency_pct={harvest.avg_potency_pct}
               grams_per_plant={harvest.grams_per_plant}
             />

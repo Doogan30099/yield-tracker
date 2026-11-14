@@ -9,7 +9,7 @@ interface HarvestCardProps {
     strain: string;
     grade_a_grams: number | null;
     extraction_grams: number | null;
-    plants: number | null;
+    plant_count : number | null;
     avg_potency_pct: number | null;
     grams_per_plant: number | null;
 
@@ -30,7 +30,7 @@ function HarvestCard(props: HarvestCardProps) {
       <p>Trim Start Date: {props.trim_start_date}</p>
       <p>Cycle Number: {props.cycle_number}</p>
       <p>Extraction Grams: {props.extraction_grams ?? 'N/A'}g</p>
-      <p>Plants: {props.plants ?? 'N/A'}</p>
+      <p>Plant Count: {props.plant_count ?? 'N/A'}</p>
       <p>Grams per Plant: {props.grams_per_plant ?? 'N/A'}g</p>
       <button onClick={() => setCount(previousCount => previousCount + 1)}>Like {count}</button>
     </div>
