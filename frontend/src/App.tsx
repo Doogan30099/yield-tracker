@@ -2,7 +2,7 @@ import HarvestCard from './components/HarvestCard'
 import './App.css'
 import type { HarvestCardProps } from './components/HarvestCard'
 import { useState, useEffect  } from 'react'
-
+import HarvestForm from './components/HarvestForm'
 
 
 function App() {
@@ -41,6 +41,7 @@ useEffect(() => {
         </div>
       </section>
       <section id= 'harvestCard'>
+        <HarvestForm onAdded={loadHarvests} />
         <div>
           <input 
             type="text" 
@@ -75,5 +76,7 @@ useEffect(() => {
     </>
   )
 }
+
+
 
 export default App

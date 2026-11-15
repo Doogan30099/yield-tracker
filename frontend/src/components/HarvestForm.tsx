@@ -1,11 +1,13 @@
 import { useState } from "react";
 
 
+interface HarvestFormProps {
+    onAdded: () => void
+}
 
 
 
-
-function HarvestForm() {
+function HarvestForm(props: HarvestFormProps) {
   const [cycleNumber, setCycleNumber] = useState("");
   const [strain, setStrain] = useState("");
   const [harvestDate, setHarvestDate] = useState("");
@@ -23,14 +25,8 @@ function HarvestForm() {
     gramsPerPlant = (gradeA + extractGrams) / plants;
   }
 
-  // 1. await fetch to http://127.0.0.1:8000/harvests
-  // 2. Pass an options object: method "POST",
-  //    headers { "Content-Type": "application/json" },
-  //    body JSON.stringify(newHarvest)
-  // 3. If !response.ok, log or show an error and stop
-  // 4. If it worked, reset every field back to ""
 
-  
+
   async function handleSubmit(e: React.SubmitEvent) {
     e.preventDefault();
     const newHarvest = {
@@ -40,10 +36,32 @@ function HarvestForm() {
       trim_start_date: trimStartDate,
       grade_a_grams: gradeA,
       extraction_grams: extractGrams,
-      avg_potency_pct: Number(avgPotencyPct),
-      grams_per_plant: { gramsPerPlant },
+      plant_count: plants,
+      avg_potency_pct: avgPotencyPct === "" ? null : Number(avgPotencyPct) ,
+      grams_per_plant:  gramsPerPlant
     };
-    console.log(newHarvest);
+    console.log(newHarvest);  
+ 
+    const response = await fetch("http://127.0.0.1:8000/harvests", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(newHarvest)
+    });
+    if (!response.ok) {
+      console.error("Failed to create harvest");
+      return;
+    }
+    setCycleNumber("");
+    setStrain("");
+    setHarvestDate("");
+    setTrimStartDate("");
+    setGradeAGrams("");
+    setExtractionGrams("");
+    setPlantCount("");
+    setAvgPotencyPct("");
+    props.onAdded()
   }
 
   return (
