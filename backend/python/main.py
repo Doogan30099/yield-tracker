@@ -3,7 +3,7 @@ from fastapi import FastAPI
 from pydantic import BaseModel, ConfigDict
 from datetime import date
 from sqlalchemy.orm import Session
-from sqlalchemy import select
+from sqlalchemy import select,func
 from database import engine, Harvest as HarvestModel
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -48,6 +48,51 @@ def get_all_yields():
         result = session.execute(stmt)
         harvests = result.scalars().all()
         return harvests
+
+# GET /stats
+# 1. Open a Session (same as GET /harvests)
+# 2. Query 1: totals for grade A, extraction, plants, and avg grams per plant
+#    (only rows where plant_count is not null)
+# 3. Query 2: top strain by total grams (group by strain, order desc, limit 1)
+# 4. Return JSON like:
+#    { total_grade_a: ___, total_extraction: ___, total_plants: ___,
+#      avg_grams_per_plant: ___, top_strain: ___ }
+@app.get("/stats")
+def get_harvest_stats():
+    with Session(engine) as session:
+        stmt = select(
+            func.sum(HarvestModel.grade_a_grams),
+            func.sum(HarvestModel.extraction_grams),
+            func.sum(HarvestModel.plant_count),
+            (func.sum(HarvestModel.grade_a_grams) + func.sum(HarvestModel.extraction_grams)) / func.sum(HarvestModel.plant_count)
+        ).where(HarvestModel.plant_count != None)
+        result = session.execute(stmt)
+        totals = result.one_or_none()
+
+        total_grade_a = totals[0] if totals else 0
+        total_extraction = totals[1] if totals else 0
+        total_plants = totals[2] if totals else 0
+        avg_grams_per_plant = totals[3] if totals else 0
+
+        stmt = select(
+            HarvestModel.strain,
+            func.sum(HarvestModel.grade_a_grams + HarvestModel.extraction_grams)
+        ).group_by(HarvestModel.strain).order_by(func.sum(HarvestModel.grade_a_grams + HarvestModel.extraction_grams).desc()).limit(1)
+        result = session.execute(stmt)
+        top_strain_row = result.first()
+        top_strain = top_strain_row[0] if top_strain_row else None
+
+        return {
+            "total_grade_a": total_grade_a,
+            "total_extraction": total_extraction,
+            "total_plants": total_plants,
+            "avg_grams_per_plant": avg_grams_per_plant,
+            "top_strain": top_strain
+        }
+
+
+
+
 
 
 

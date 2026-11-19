@@ -3,6 +3,8 @@ import './App.css'
 import type { HarvestCardProps } from './components/HarvestCard'
 import { useState, useEffect  } from 'react'
 import HarvestForm from './components/HarvestForm'
+import StatsCard from './components/StatsCard'
+
 
 
 function App() {
@@ -11,7 +13,7 @@ function App() {
  const [error, setError] = useState<string | null>(null);
  const [loading, setLoading] = useState<boolean>(true);
  const [searchTerm, setSearchTerm] = useState<string>("");
-
+ const [showForm, setShowForm] = useState<boolean>(false);
 
 
 async function loadHarvests() {
@@ -41,7 +43,10 @@ useEffect(() => {
         </div>
       </section>
       <section id= 'harvestCard'>
-        <HarvestForm onAdded={loadHarvests} />
+        {showForm && <HarvestForm onAdded={loadHarvests} />}
+        <button onClick={() => setShowForm(!showForm)}>
+          {showForm ? "Hide Form" : "Add Harvest"}
+        </button>
         <div>
           <input 
             type="text" 
@@ -72,6 +77,9 @@ useEffect(() => {
         {error && <p style={{ color: "red" }}>{error}</p>}
         {loading && <p>Loading...</p>}
         {!loading && !error && harvests.length === 0 && <p>No harvests found.</p>}
+      </section>
+      <section id='statsCard'>
+        <StatsCard />
       </section>
     </>
   )
