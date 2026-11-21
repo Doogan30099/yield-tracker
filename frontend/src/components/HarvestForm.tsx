@@ -42,12 +42,12 @@ function HarvestForm(props: HarvestFormProps) {
     };
     console.log(newHarvest);  
  
-    const response = await fetch("http://127.0.0.1:8000/harvests", {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/harvests`, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify(newHarvest)
+      body: JSON.stringify(newHarvest),
     });
     if (!response.ok) {
       console.error("Failed to create harvest");
