@@ -17,7 +17,7 @@ function App() {
 
 
 async function loadHarvests() {
-  return fetch("http://127.0.0.1:8000/harvests")
+  return fetch(`${import.meta.env.VITE_API_URL}/harvests`)
     .then((response) => {
       if (!response.ok) {
         throw new Error("Network response was not ok");
