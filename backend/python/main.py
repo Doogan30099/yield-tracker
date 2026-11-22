@@ -14,16 +14,29 @@ from fastapi.middleware.cors import CORSMiddleware
 
 class Harvest(BaseModel):
     model_config = ConfigDict(from_attributes=True)
+    id: int | None 
+    harvest_date: date | None 
+    trim_start_date: date | None 
+    cycle_number: str | None 
+    strain: str | None 
+    grade_a_grams: float | None
+    extraction_grams: float | None 
+    plant_count: int | None 
+    avg_potency_pct: float | None
+    grams_per_plant: float | None 
 
-    harvest_date: date | None = None
-    trim_start_date: date | None = None
-    cycle_number: str | None = None
-    strain: str | None = None
-    grade_a_grams: float | None = None
-    extraction_grams: float | None = None
-    plant_count: int | None = None
+
+class HarvestCreate(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    harvest_date: date 
+    trim_start_date: date 
+    cycle_number: str 
+    strain: str 
+    grade_a_grams: float 
+    extraction_grams: float 
+    plant_count: int 
     avg_potency_pct: float | None = None
-    grams_per_plant: float | None = None
 
 
 app = FastAPI()
@@ -94,11 +107,17 @@ def get_harvest_stats():
 
 
 
-
+# 1. make HarvestCreate: every field except id and grams_per_plant
+# 2. put grams_per_plant back into Harvest (grams_per_plant: float | None)
+# 3. change the route parameter to harvest: HarvestCreate
 
 @app.post("/harvests", response_model=Harvest)
-def create_harvest(harvest: Harvest):
+def create_harvest(harvest: HarvestCreate):
     harvest_data = harvest.model_dump()
+    if harvest_data["plant_count"] > 0:
+        harvest_data["grams_per_plant"] = (harvest_data["grade_a_grams"] + harvest_data["extraction_grams"]) / harvest_data["plant_count"]
+    else:
+        harvest_data["grams_per_plant"] = None
     with Session(engine) as session:
         harvest_model = HarvestModel(**harvest_data)
         session.add(harvest_model)

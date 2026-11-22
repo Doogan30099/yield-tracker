@@ -1,16 +1,8 @@
 
 import {useState, useEffect} from "react"
+import type {Stats} from "../types"
+import { getStats } from "../api"
 
-
-
-interface Stats {
-    total_grade_a : number,
-    total_extraction: number,
-    total_plants: number,
-    avg_grams_per_plant: number,
-    top_strain: string
-
-}
 
 function StatCard() {
     const [stats, setStats ] = useState<Stats | null>(null)
@@ -21,13 +13,7 @@ function StatCard() {
 
 
     useEffect(() => {
-        fetch(`${import.meta.env.VITE_API_URL}/stats`)
-          .then((response) => {
-            if (!response.ok) {
-              throw new Error("Network response was not ok!");
-            }
-            return response.json();
-          })
+          getStats()
           .then((data) => setStats(data))
           .catch((error) => setError(error.message))
         

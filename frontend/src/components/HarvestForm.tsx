@@ -1,4 +1,6 @@
 import { useState } from "react";
+import type { NewHarvest } from "../types";
+import { createHarvest } from "../api";
 
 
 interface HarvestFormProps {
@@ -27,9 +29,9 @@ function HarvestForm(props: HarvestFormProps) {
 
 
 
-  async function handleSubmit(e: React.SubmitEvent) {
+  async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
-    const newHarvest = {
+    const newHarvest: NewHarvest = {
       cycle_number: cycleNumber,
       strain: strain,
       harvest_date: harvestDate,
@@ -38,31 +40,25 @@ function HarvestForm(props: HarvestFormProps) {
       extraction_grams: extractGrams,
       plant_count: plants,
       avg_potency_pct: avgPotencyPct === "" ? null : Number(avgPotencyPct) ,
-      grams_per_plant:  gramsPerPlant
     };
-    console.log(newHarvest);  
  
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/harvests`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(newHarvest),
-    });
-    if (!response.ok) {
-      console.error("Failed to create harvest");
-      return;
+    try {
+      await createHarvest(newHarvest);  
+      setCycleNumber("");
+      setStrain("");
+      setHarvestDate("");
+      setTrimStartDate("");
+      setGradeAGrams("");
+      setExtractionGrams("");
+      setPlantCount("");
+      setAvgPotencyPct("");
+      props.onAdded()  
+    } catch (error) {
+      console.error("Failed to create harvest", error);
     }
-    setCycleNumber("");
-    setStrain("");
-    setHarvestDate("");
-    setTrimStartDate("");
-    setGradeAGrams("");
-    setExtractionGrams("");
-    setPlantCount("");
-    setAvgPotencyPct("");
-    props.onAdded()
-  }
+  
+  
+}
 
   return (
     <div>

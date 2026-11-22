@@ -1,15 +1,16 @@
 import HarvestCard from './components/HarvestCard'
 import './App.css'
-import type { HarvestCardProps } from './components/HarvestCard'
 import { useState, useEffect  } from 'react'
 import HarvestForm from './components/HarvestForm'
 import StatsCard from './components/StatsCard'
+import { getHarvests } from './api'
+import type { Harvest } from './types'
 
 
 
 function App() {
 
- const [harvests, setHarvests] = useState<HarvestCardProps[]>([]);
+ const [harvests, setHarvests] = useState<Harvest[]>([]);
  const [error, setError] = useState<string | null>(null);
  const [loading, setLoading] = useState<boolean>(true);
  const [searchTerm, setSearchTerm] = useState<string>("");
@@ -17,13 +18,7 @@ function App() {
 
 
 async function loadHarvests() {
-  return fetch(`${import.meta.env.VITE_API_URL}/harvests`)
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-      return response.json();
-    })
+  return getHarvests()
     .then((data) => setHarvests(data))
     .catch((error) => setError(error.message))
     .finally(() => setLoading(false));
@@ -56,7 +51,7 @@ useEffect(() => {
           />
           {harvests
             .filter((harvest) => 
-              harvest.cycle_number?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+              harvest.cycle_number.toString().toLowerCase().includes(searchTerm.toLowerCase()) || 
               harvest.strain?.toLowerCase().includes(searchTerm.toLowerCase())
             )
             .map((harvest) => (
