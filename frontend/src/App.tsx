@@ -62,18 +62,7 @@ useEffect(() => {
               harvest.strain?.toLowerCase().includes(searchTerm.toLowerCase())
             )
             .map((harvest) => (
-            <HarvestCard 
-              key={harvest.cycle_number + ':' +harvest.strain}
-              harvest_date={harvest.harvest_date}
-              trim_start_date={harvest.trim_start_date}
-              cycle_number={harvest.cycle_number}
-              strain={harvest.strain}
-              grade_a_grams={harvest.grade_a_grams}
-              extraction_grams={harvest.extraction_grams}
-              plant_count={harvest.plant_count}
-              avg_potency_pct={harvest.avg_potency_pct}
-              grams_per_plant={harvest.grams_per_plant}
-            />
+            <HarvestCard key={harvest.id} harvest={harvest} />
           ))}
         </div>
         {error && <p style={{ color: "red" }}>{error}</p>}
