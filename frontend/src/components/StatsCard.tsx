@@ -1,35 +1,32 @@
 
-import {useState, useEffect} from "react"
 import type {Stats} from "../types"
-import { getStats } from "../api"
-
-
-function StatCard() {
-    const [stats, setStats ] = useState<Stats | null>(null)
-    const [error, setError] = useState<string | null>(null)
 
 
 
 
 
-    useEffect(() => {
-          getStats()
-          .then((data) => setStats(data))
-          .catch((error) => setError(error.message))
-        
+export interface StatsCardProps {
+    stats : Stats | null
+    error : string | null
+}
 
 
-     }, []);
 
-    if (error) return <p>{error}</p>
-    if (!stats) return <p>Loading Stats...</p>
+
+
+
+
+function StatCard(props: StatsCardProps) {
+
+    if (props.error) return <p>{props.error}</p>
+    if (!props.stats) return <p>Loading Stats...</p>
     return( 
      <div>
-        <p>Total Grade A : {stats?.total_grade_a}</p>
-        <p>Total Extraction Grams : {stats?.total_extraction}</p>
-        <p>Total Plants : {stats?.total_plants}</p>
-        <p>Top Strain : {stats?.top_strain}</p>
-        <p>Average Grams Per Plant : {stats?.avg_grams_per_plant.toFixed(2)}</p>
+        <p>Total Grade A : {props.stats?.total_grade_a}</p>
+        <p>Total Extraction Grams : {props.stats?.total_extraction}</p>
+        <p>Total Plants : {props.stats?.total_plants}</p>
+        <p>Top Strain : {props.stats?.top_strain}</p>
+        <p>Average Grams Per Plant : {props.stats?.avg_grams_per_plant.toFixed(2)}</p>
      </div>)
 
    

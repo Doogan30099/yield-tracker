@@ -3,9 +3,8 @@ import './App.css'
 import { useState, useEffect  } from 'react'
 import HarvestForm from './components/HarvestForm'
 import StatsCard from './components/StatsCard'
-import { getHarvests } from './api'
-import type { Harvest } from './types'
-
+import { getHarvests, getStats } from './api'
+import type { Harvest, Stats } from './types'
 
 
 function App() {
@@ -15,7 +14,8 @@ function App() {
  const [loading, setLoading] = useState<boolean>(true);
  const [searchTerm, setSearchTerm] = useState<string>("");
  const [showForm, setShowForm] = useState<boolean>(false);
-
+ const [stats, setStats] = useState<Stats | null>(null);
+ const [statsError, setStatsError] = useState<string | null>(null);
 
 async function loadHarvests() {
   return getHarvests()
@@ -23,9 +23,16 @@ async function loadHarvests() {
     .catch((error) => setError(error.message))
     .finally(() => setLoading(false));
 }
+async function loadStats() {
+  return getStats()
+    .then((data) => setStats(data))
+    .catch((statsError) => setStatsError(statsError.message))
+}
 
 useEffect(() => {
   loadHarvests()
+  loadStats()
+
 }, []);
 
 
@@ -38,7 +45,7 @@ useEffect(() => {
         </div>
       </section>
       <section id= 'harvestCard'>
-        {showForm && <HarvestForm onAdded={loadHarvests} />}
+        {showForm && <HarvestForm onAdded={() => {loadHarvests(); loadStats();}}/>}
         <button onClick={() => setShowForm(!showForm)}>
           {showForm ? "Hide Form" : "Add Harvest"}
         </button>
@@ -74,7 +81,8 @@ useEffect(() => {
         {!loading && !error && harvests.length === 0 && <p>No harvests found.</p>}
       </section>
       <section id='statsCard'>
-        <StatsCard />
+        <StatsCard stats={stats} error={statsError}
+        />
       </section>
     </>
   )
